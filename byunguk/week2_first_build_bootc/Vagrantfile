@@ -1,0 +1,91 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  # Ubuntu 22.04 LTS (Jammy Jellyfish) 이미지 사용
+  config.vm.box = "ubuntu/jammy64"
+  
+  # VM 설정
+  config.vm.provider "virtualbox" do |vb|
+    # VM 이름 설정
+    vb.name = "Ubuntu-bootC"
+    # 메모리 크기 설정 (4GB)
+    vb.memory = 4096
+    # CPU 코어 수 설정
+    vb.cpus = 2
+  end
+
+  # 포트 포워딩 설정 (호스트 8080 -> 게스트 80)
+  config.vm.network "forwarded_port", guest: 80, host: 8080
+
+  # VM 프로비저닝 스크립트
+  config.vm.provision "shell", inline: <<-SHELL
+    # 패키지 목록 업데이트
+    apt-get update
+    
+    # 필요한 기본 패키지 설치
+    apt-get install -y podman git curl qemu-utils
+    
+    # bootC 이미지 빌드 준비
+    sudo -u vagrant mkdir -p /home/vagrant/bootc-webserver
+    cd /home/vagrant/bootc-webserver
+    
+    # CentOS Stream 9 bootC 기본 이미지 가져오기
+    sudo podman pull quay.io/centos-bootc/centos-bootc:stream9
+    
+    # Containerfile 생성
+    cat > /home/vagrant/bootc-webserver/Containerfile << 'EOL'
+FROM quay.io/centos-bootc/centos-bootc:stream9
+
+# 웹서버(httpd) 설치 및 활성화
+RUN dnf -y install httpd && \\
+    systemctl enable httpd && \\
+    mv /var/www /usr/share/www && \\
+    echo 'd /var/log/httpd 0700 - - -' > /usr/lib/tmpfiles.d/httpd-log.conf && \\
+    sed -ie 's,/var/www,/usr/share/www,' /etc/httpd/conf/httpd.conf
+
+# 부팅 인수 설정을 위한 디렉토리 생성
+RUN mkdir -p /usr/lib/bootc/kargs.d
+
+# 부팅 인수 설정
+RUN echo 'kargs = ["console=ttyS0,115200n8"]' > /usr/lib/bootc/kargs.d/kcmdline.toml
+
+# 기본 index.html 제거
+RUN rm /usr/share/httpd/noindex -rf
+
+# 사용자 지정 웹페이지 추가
+COPY index.html /usr/share/www/html/
+
+# 포트 노출
+EXPOSE 80
+EOL
+    
+    # 웹페이지 파일 생성
+    cat > /home/vagrant/bootc-webserver/index.html << 'EOL'
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My First bootC Web Server</title>
+</head>
+<body>
+    <h1>성공!</h1>
+    <p>bootC로 빌드한 웹서버가 실행 중입니다!</p>
+</body>
+</html>
+EOL
+
+    # 출력 디렉토리 생성
+    mkdir -p /home/vagrant/bootc-webserver/output
+    
+    # 파일 소유권 변경
+    chown -R vagrant:vagrant /home/vagrant/bootc-webserver
+    
+    # 완료 메시지 출력
+    echo "==================================================================="
+    echo "환경 설정이 완료되었습니다."
+    echo "bootC 이미지 빌드를 시작하려면:"
+    echo "  cd ~/bootc-webserver"
+    echo "  sudo podman build -t my-bootc-webserver ."
+    echo "==================================================================="
+  SHELL
+end
