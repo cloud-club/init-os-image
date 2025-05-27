@@ -147,7 +147,7 @@ Revision 58bcc6747a9 27 January 2025, compilation time: Jan 27 2025 00:00:00
 # 외부 도커에서 가져오기
 curl https://registry.hub.docker.com/v2/repositories/gag2012/bootc-zabbix/tags/
 bootc switch docker.io/gag2012/bootc-zabbix:v3 --apply
-![alt text](image.png)
+![alt text](IMAGES/image.png)
 
 
 bootc status
@@ -185,12 +185,12 @@ vi harbor.yml
 
 
 sudo ./install.sh (반짝반짝 이쁨)
-![alt text](image-2.png)
+![alt text](IMAGES/image-2.png)
 
 
 (3) Harbor 홈페이지 접속
 ID : admin / PW : Harbor12345
-![alt text](image-3.png)
+![alt text](IMAGES/image-3.png)
 
 
 # Harbor에 bootc 이미지 업로드
@@ -203,7 +203,7 @@ insecure = true
 systemctl restart podman
 
 podman login harbor.bootc.com:80
-![alt text](image-4.png)
+![alt text](IMAGES/image-4.png)
 
 
 # Harbor에 올릴 새로운 컨테이너 이미지 생성
@@ -229,14 +229,14 @@ REPOSITORY                                TAG         IMAGE ID      CREATED     
 harbor.bootc.com:80/sales/nginx-mariadb   v1          ccf857be1459  7 minutes ago  1.94 GB
 
 (4) Harbor 프로젝트 생성
-![alt text](image-6.png)
+![alt text](IMAGES/image-6.png)
 
 (5) podman push to harbor sales repo
 podman push harbor.bootc.com:80/sales/nginx-mariadb:v1
-![alt text](image-5.png)
+![alt text](IMAGES/image-5.png)
 
 (6) Harbor > sales 프로젝트 > 정상 업로드 확인
-![alt text](image-7.png)
+![alt text](IMAGES/image-7.png)
 
 # Client에서 해당 Harbor bootc 레포지토리를 통해 업그레이드
 (1) PODMAN 보안 설정
@@ -255,11 +255,11 @@ podman login harbor.bootc.com:80
 [root@localhost ~]# bootc switch harbor.bootc.com:80/sales/nginx-mariadb:v1 --apply
 ERROR Switching: Creating importer: failed to invoke method OpenImage: failed to invoke method OpenImage: reading manifest v1 in harbor.bootc.com:80/sales/nginx-mariadb: unauthorized: unauthorized to access repository: sales/nginx-mariadb, action: pull: unauthorized to access repository: sales/nginx-mariadb, action: pull
 
-![alt text](image-8.png)
-![alt text](image-9.png)
+![alt text](IMAGES/image-8.png)
+![alt text](IMAGES/image-9.png)
 
 (4) 프로젝트를 Public으로 변경하니 가능
-![alt text](image-10.png)
+![alt text](IMAGES/image-10.png)
 
 (5) 스위칭 및 리부팅 이후 bootc status (대략 60초 소요)
 아니 근데 생각해보니깐 IP 주소를 바꿔줬었는데 이건 새롭게 반영이 안되어서 엄청 편하네 진짜 뭐지
