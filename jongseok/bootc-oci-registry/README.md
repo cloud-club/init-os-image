@@ -123,7 +123,7 @@ zabbix_server (Zabbix) 6.4.21
 ```
 
 # CASE2 ) Docker Hub
-![alt text](IMAGEs/image-14.png)
+![alt text](IMAGES/image-14.png)
 ---
 ```
 목적 : 도커 허브 업로드 및 '배포(v1>v3)'
