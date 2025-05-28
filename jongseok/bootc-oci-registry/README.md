@@ -127,7 +127,7 @@ zabbix_server (Zabbix) 6.4.21
 ---
 ```
 목적 : 도커 허브 업로드 및 '배포(v1>v3)'
-경로 : 내부 bootc push > 도커 외부 허브 > 외부 클라이언트 deploy 
+경로 : SITEA bootc push > 도커 외부 허브 > SITEB 클라이언트 deploy 
 참고 : 컨테이너 올리자마자 7명이 다운로드 받아서 흠칫함. 망분리 및 다른 플랫폼(ESXi>Hyper-V)이어도
       배포 가능한 점 확인
 ```
