@@ -27,7 +27,6 @@
 - 리눅스를 프로젝트를 통해 공부해보고 싶은 사람
 - 컨테이너를 넘어 머신(노드) 레이어의 OS 구성을 직접 커스텀하고 자동화해서 배포해보고 싶은 사람 (CI/CD)
 
-
 ---
 
 <br>
@@ -47,8 +46,6 @@
   <tr>
     <td align="center"><a href="https://github.com/yucori"><img src="https://avatars.githubusercontent.com/u/110710238?v=4" width="100px;" alt=""/><br /><sub><b>
 장지원</b></sub></a><br /></td>
-    <td align="center"><a href="https://github.com/doxxx93"><img src="https://avatars.githubusercontent.com/u/51396905?v=4" width="100px;" alt=""/><br /><sub><b>
-김도율</b></sub></a><br /></td>
     <td align="center"><a href="https://github.com/jskim096"><img src="https://avatars.githubusercontent.com/u/40004210?v=4" width="100px;" alt=""/><br /><sub><b>
 김종석</b></sub></a><br /></td>
   </tr>
