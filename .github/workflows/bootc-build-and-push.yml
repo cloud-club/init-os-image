@@ -1,0 +1,24 @@
+name: Build and Push Zabbix Image
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Podman 설치
+        run: sudo dnf install -y podman
+
+      - name: 이미지 빌드
+        run: podman build -t my-zabbix-image:latest .
+
+      - name: 레지스트리 로그인
+        run: podman login -u ${{ secrets.REGISTRY_USER }} -p ${{ secrets.REGISTRY_PASS }} docker.io
+        
+      - name: 이미지 푸시
+        run: podman push my-zabbix-image:latest docker.io/gag2012/github-zabbix:latest
