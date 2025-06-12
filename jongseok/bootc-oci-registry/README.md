@@ -124,7 +124,8 @@ zabbix_server (Zabbix) 6.4.21
 
 # CASE2 ) Docker Hub
 
-![alt text](IMAGEs/image-14.png)
+![alt text](IMAGES/image-14.png)
+
 ---
 ```
 목적 : 도커 허브 업로드 및 '배포(v1>v3)'
@@ -362,5 +363,4 @@ Writing manifest to image destination
 - 서비스 업계와 같이 빠른 환경 변화가 필요한 기업이라면 도입 가치 있음
 - 다만 안정성을 우선시하는 기업이라면 당장은 보류할 듯
 - 오픈소스이기도 하고 bootc 커뮤니티가 활발해졌으면 좋겠다ㅎㅎ
-
 ```
