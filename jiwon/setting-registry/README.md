@@ -18,7 +18,7 @@ Repository
 
 1. docker hub
     1. private repo가 가능하기는 한데, 1개까지만 무료임
-    2. 이전에 public repo로 생성하니 매우 빠르게 다른 사람들이 다운로드 받아 가는 것을 경험 → 보안적으로 위험으로 인해 사용에 불편함이 있음
+    2. 이전에 public repo로 생성하니 매우 빠르게 다른 사람들이 다운로드 받아 가는 것을 경험 → 보안적인 위험으로 인해 사용에 불편함이 있음
 2. harbor
     1. private registry 오픈소스
     2. cncf graduated프로젝트 - 안정성, 레퍼런스 확보
@@ -72,7 +72,7 @@ github packages 인증 설정 문제인 듯. key가 잘 적용되지 못하고 �
 
 도커 허브로는 매우 잘 됨
 
-`podman switch docker.io/kooriangman/bootc:v2 --apply`
+`bootc switch docker.io/kooriangman/bootc:v2 --apply`
 
 ![alt text](1.png)
 
