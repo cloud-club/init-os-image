@@ -1,0 +1,84 @@
+name: Build ISO and Deploy VM on ESXi
+
+on: workflow_dispatch
+
+env:
+  IMAGE_NAME: my_dashboard
+  IMAGE_VERSION: ${{ github.sha_short || github.run_id }}
+  ISO_DIRNAME: esxi_dir
+  VM_NAME: git-vm
+  VM_CPU: 2
+  VM_MEM: 4
+  VM_DISK: 30
+  VM_NETWORK: "VM Network"
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      # 1. 컨테이너 이미지 빌드
+      - name: Build Container Image
+        run: |
+          if [ -z "$IMAGE_VERSION" ]; then
+            echo "ERROR: IMAGE_VERSION must be set!"
+            exit 1
+          fi
+          podman build --network=host \
+            -t localhost/$IMAGE_NAME:$IMAGE_VERSION .
+
+      # 2. ISO 생성
+      - name: Generate ISO
+        run: |
+          mkdir -p output
+          sudo podman run --rm --privileged \
+            --network=host \
+            -v ./output:/output \
+            -v /var/lib/containers/storage:/var/lib/containers/storage:rw \
+            quay.io/centos-bootc/bootc-image-builder:latest \
+            --type iso \
+            --output /output/$ISO_DIRNAME \
+            localhost/$IMAGE_NAME:$IMAGE_VERSION
+
+      # 3. ISO 서빙 (파일명 동적 생성)
+      - name: Serve ISO
+        run: |
+          ISO_FILENAME="${IMAGE_NAME}-${IMAGE_VERSION}.iso"
+          cd output
+          mv $ISO_DIRNAME/bootiso/install.iso $ISO_FILENAME
+          nohup python3 -m http.server 8080 --bind 0.0.0.0 > http.log 2>&1 &
+          echo $! > http.pid
+
+      # 4. ESXi 전송 (파일명 동적 생성)
+      - name: Transfer to ESXi
+        run: |
+          ISO_FILENAME="${IMAGE_NAME}-${IMAGE_VERSION}.iso"
+          RUNNER_IP=$(hostname -I | awk '{print $1}')
+          sshpass -p "${{ secrets.ESXI_PASS }}" ssh -o StrictHostKeyChecking=no \
+            ${{ secrets.ESXI_USER }}@${{ secrets.ESXI_HOST }} \
+            "wget http://$RUNNER_IP:8080/$ISO_FILENAME -O /vmfs/volumes/${{ secrets.ESXI_DATASTORE }}/$ISO_FILENAME"
+
+      # 5. VM 생성 (파일명 동적 생성)
+      - name: Create VM
+        run: |
+          ISO_FILENAME="${IMAGE_NAME}-${IMAGE_VERSION}.iso"
+          chmod +x esxi-vm-create.py
+          python3 esxi-vm-create.py \
+            -H ${{ secrets.ESXI_HOST }} \
+            -U ${{ secrets.ESXI_USER }} \
+            -P ${{ secrets.ESXI_PASS }} \
+            -n ${VM_NAME} \
+            -c ${VM_CPU} \
+            -m ${VM_MEM} \
+            -v ${VM_DISK} \
+            -S ${{ secrets.ESXI_DATASTORE }} \
+            -N "${VM_NETWORK}" \
+            -i /vmfs/volumes/${{ secrets.ESXI_DATASTORE }}/${ISO_FILENAME} \
+            -o "svga.autodetect=TRUE" "monitor_phys.host_triggers=TRUE" \
+
+      # 6. 정리
+      - name: Cleanup
+        if: always()
+        run: |
+          kill $(cat output/http.pid) || true
