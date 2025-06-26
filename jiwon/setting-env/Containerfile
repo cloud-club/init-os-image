@@ -1,0 +1,11 @@
+FROM quay.io/centos-bootc/centos-bootc:stream9
+
+# 1. cloud-init 및 httpd 설치
+RUN dnf install -y cloud-init httpd && \
+    systemctl enable cloud-init.service httpd && \
+    dnf clean all
+
+# 2. index.html 생성 (웹 서버 테스트용)
+RUN echo "Cloud-Init & HTTPD Test Success!" > /var/www/html/index.html
+
+EXPOSE 22 80

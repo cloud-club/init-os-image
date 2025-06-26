@@ -1,0 +1,17 @@
+## Basic Version
+FROM quay.io/centos-bootc/centos-bootc:stream9
+
+RUN dnf -y install cloud-init && \
+    systemctl enable cloud-init.service && \
+    dnf clean all
+
+EXPOSE 22 80
+
+## Version Nginx
+# FROM quay.io/centos-bootc/centos-bootc:stream9
+
+# RUN dnf -y install cloud-init nginx && \
+#     systemctl enable cloud-init.service nginx && \
+#     dnf clean all
+
+# EXPOSE 22 80
